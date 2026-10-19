@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Para Mimi ♡</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #08090d;
+    color: #f4eef1;
+    font-family: Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Fondo */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(150, 80, 105, 0.10), transparent 25%),
+        radial-gradient(circle at 80% 75%, rgba(100, 80, 110, 0.08), transparent 25%);
+}
+
+/* Estrellitas */
+.stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image:
+        radial-gradient(circle, white 1px, transparent 1px),
+        radial-gradient(circle, white 1px, transparent 1px),
+        radial-gradient(circle, white 1px, transparent 1px);
+    background-size: 150px 170px, 220px 240px, 300px 300px;
+    background-position: 20px 30px, 80px 100px, 150px 50px;
+}
+
+/* Pantallas */
+.screen {
+    min-height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 35px 25px;
+    position: relative;
+    z-index: 2;
+}
+
+.screen.active {
+    display: flex;
+    animation: aparecer 1s ease;
+}
+
+.content {
+    width: 100%;
+    max-width: 500px;
+}
+
+/* Corazón */
+.heart {
+    font-size: 85px;
+    color: #c8899d;
+    animation: flotar 3s ease-in-out infinite;
+    text-shadow: 0 0 25px rgba(200,137,157,0.25);
+    margin-bottom: 25px;
+}
+
+/* Textos */
+h1 {
+    font-size: 32px;
+    font-weight: normal;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+h2 {
+    font-size: 25px;
+    font-weight: normal;
+    color: #e6c8d1;
+    margin-bottom: 18px;
+}
+
+p {
+    font-family: Arial, sans-serif;
+    color: #aaa5a8;
+    line-height: 1.8;
+    font-size: 15px;
+}
+
+/* Botones */
+button {
+    margin-top: 30px;
+    padding: 13px 28px;
+    border: 1px solid #9d6578;
+    border-radius: 30px;
+    background: transparent;
+    color: #e5c6cf;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #9d6578;
+    color: white;
+}
+
+/* Fecha */
+.date {
+    font-family: Arial, sans-serif;
+    letter-spacing: 5px;
+    color: #c8899d;
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+/* Carta */
+.letter {
+    text-align: left;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(200,137,157,0.15);
+    border-radius: 18px;
+    padding: 25px;
+    margin-top: 20px;
+}
+
+.letter p {
+    margin-bottom: 15px;
+}
+
+/* Animaciones */
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes flotar {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="stars"></div>
+
+
+<!-- MÚSICA -->
+
+<audio id="backgroundMusic" loop>
+    <source src="musica.mp3" type="audio/mpeg">
+</audio>
+
+
+<!-- PANTALLA 1 -->
+
+<section class="screen active" id="screen1">
+
+    <div class="content">
+
+        <div class="heart">♡</div>
+
+        <h1>Para vos, Mimi ♡</h1>
+
+        <button id="startButton">
+            Tocá para comenzar
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- PANTALLA 2 -->
+
+<section class="screen" id="screen2">
+
+    <div class="content">
+
+        <h2>Gracias por llegar a mi vida.</h2>
+
+        <p>
+            Sea por casualidad, destino, suerte o simplemente una coincidencia, me hace muy feliz tenerte conmigo.
+        </p>
+
+        <p style="margin-top:20px;">
+            No sé qué fue lo que hizo que nuestros caminos se cruzaran, pero agradezco muchísimo que haya pasado.
+        </p>
+
+        <button id="button2">
+            Continuar ♡
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- PANTALLA 3 -->
+
+<section class="screen" id="screen3">
+
+    <div class="content">
+
+        <div class="date">
+            23 · 09 · 2026
+        </div>
+
+        <h2>El día que empezamos nuestra relación.</h2>
+
+        <p>
+            Yo estaba tan nerviosa y tenía miedo de lo que podía pasar. No esperaba que vos sintieras lo mismo; solo sabía que era algo que necesitaba decirte.
+        </p>
+
+        <p style="margin-top:20px;">
+            Cuando me contaste que lo que sentías era mutuo, no supe cómo reaccionar. Y todavía, hasta ese momento, no te había hecho la pregunta que terminaría empezando todo esto.
+        </p>
+
+        <p style="margin-top:20px;">
+            Me alegra muchísimo haberlo hecho.
+        </p>
+
+        <button id="button3">
+            Seguir ♡
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- PANTALLA 4 -->
+
+<section class="screen" id="screen4">
+
+    <div class="content">
+
+        <h2>Para vos</h2>
+
+        <div class="letter">
+
+            <p>
+                Ya sabés que soy una persona a la que le cuesta decir lo que siente y expresarse. Nunca me consideré muy detallista tampoco, pero desde que estoy con vos me nace hacer todas esas cosas que nunca hice con nadie.
+            </p>
+
+            <p>
+                Quiero hacerte sentir querida de la forma en que vos puedas entenderlo. Quiero cuidarte, acompañarte y estar para vos.
+            </p>
+
+            <p>
+                Y aunque no sepamos qué nos espera más adelante, quiero disfrutar cada momento que tengamos y seguir eligiéndote mientras construimos lo nuestro.
+            </p>
+
+        </div>
+
+        <button id="button4">
+            Hay algo más...
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- PANTALLA FINAL -->
+
+<section class="screen" id="screen5">
+
+    <div class="content">
+
+        <div class="heart">♥</div>
+
+        <h1>Y si pudiera volver al 23 de septiembre,</h1>
+
+        <p>
+            sabiendo todo lo que iba a sentir después...
+        </p>
+
+        <p style="margin-top:20px;">
+            te elegiría otra vez.
+        </p>
+
+        <p style="margin-top:30px;">
+            Gracias por llegar a mi vida, Mimi.
+        </p>
+
+        <p style="margin-top:20px; color:#d6aab8;">
+            Feliz primer mes, mi amor. ♡
+        </p>
+      <button id="enterUniverseButton">
+    una ultima cosa... ♡
+      </button>
+
+    </div>
+
+</section>
+
+
+<script>
+
+/* =====================================================
+   MÚSICA
+===================================================== */
+
+const music = document.getElementById("backgroundMusic");
+
+
+/* =====================================================
+   FUNCIÓN PARA CAMBIAR DE PANTALLA
+===================================================== */
+
+function showScreen(number) {
+
+    document.querySelectorAll(".screen").forEach(function(screen) {
+
+        screen.classList.remove("active");
+
+    });
+
+
+    document.getElementById("screen" + number)
+        .classList.add("active");
+
+
+    window.scrollTo(0, 0);
+}
+
+
+/* =====================================================
+   PRIMER BOTÓN
+   AQUÍ COMIENZA LA MÚSICA
+===================================================== */
+
+document.getElementById("startButton").addEventListener(
+    "click",
+    function() {
+
+        music.volume = 0.65;
+
+        music.play().catch(function(error) {
+
+            console.log(
+                "No se pudo iniciar la música:",
+                error
+            );
+
+        });
+
+
+        showScreen(2);
+
+    }
+);
+
+
+/* =====================================================
+   RESTO DE BOTONES
+===================================================== */
+
+document.getElementById("button2").addEventListener(
+    "click",
+    function() {
+
+        showScreen(3);
+
+    }
+);
+
+
+document.getElementById("button3").addEventListener(
+    "click",
+    function() {
+
+        showScreen(4);
+
+    }
+);
+
+
+document.getElementById("button4").addEventListener(
+    "click",
+    function() {
+
+        showScreen(5);
+
+    }
+);
+  document.getElementById("enterUniverseButton").addEventListener(
+    "click",
+    function() {
+
+        const universe = document.createElement("iframe");
+
+        universe.src = "./cora.html";
+        universe.style.position = "fixed";
+        universe.style.top = "0";
+        universe.style.left = "0";
+        universe.style.width = "100%";
+        universe.style.height = "100%";
+        universe.style.border = "none";
+        universe.style.zIndex = "9999";
+
+        document.body.appendChild(universe);
+
+    }
+);
+
+</script>
+
+</body>
+</html>
