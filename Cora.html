@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Mimi ♡</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+}
+</style>
+</head>
+
+<body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+
+// =====================================================
+// ESCENA
+// =====================================================
+
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(
+    45,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+);
+
+camera.position.set(0, 2, 62);
+
+const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: false
+});
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio, 2)
+);
+
+renderer.setClearColor(0x000000, 1);
+
+document.body.appendChild(renderer.domElement);
+
+
+// =====================================================
+// UNIVERSO
+// =====================================================
+
+const universe = new THREE.Group();
+
+universe.position.y = 5;
+
+scene.add(universe);
+
+
+// =====================================================
+// CORAZÓN
+// =====================================================
+
+const heartCount = 50000;
+
+const heartPositions =
+    new Float32Array(heartCount * 3);
+
+const heartColors =
+    new Float32Array(heartCount * 3);
+
+const heartColor1 =
+    new THREE.Color(0xff2f92);
+
+const heartColor2 =
+    new THREE.Color(0xff8ac8);
+
+const HEART_SCALE = 0.58;
+
+for (let i = 0; i < heartCount; i++) {
+
+    const t =
+        Math.random() * Math.PI * 2;
+
+    const x =
+        16 * Math.pow(Math.sin(t), 3);
+
+    const y =
+        13 * Math.cos(t)
+        - 5 * Math.cos(2 * t)
+        - 2 * Math.cos(3 * t)
+        - Math.cos(4 * t);
+
+    const z =
+        (Math.random() - 0.5) * 5;
+
+    const scale =
+        Math.sqrt(Math.random());
+
+    heartPositions[i * 3] =
+        x * HEART_SCALE * scale;
+
+    heartPositions[i * 3 + 1] =
+        y * HEART_SCALE * scale;
+
+    heartPositions[i * 3 + 2] =
+        z * HEART_SCALE * scale;
+
+    const c =
+        heartColor1.clone()
+        .lerp(
+            heartColor2,
+            Math.random()
+        );
+
+    heartColors[i * 3] = c.r;
+    heartColors[i * 3 + 1] = c.g;
+    heartColors[i * 3 + 2] = c.b;
+}
+
+const heartGeometry =
+    new THREE.BufferGeometry();
+
+heartGeometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(
+        heartPositions,
+        3
+    )
+);
+
+heartGeometry.setAttribute(
+    "color",
+    new THREE.BufferAttribute(
+        heartColors,
+        3
+    )
+);
+
+const heartMaterial =
+    new THREE.PointsMaterial({
+
+        size: 0.105,
+
+        vertexColors: true,
+
+        transparent: true,
+
+        opacity: 0.95,
+
+        blending:
+            THREE.AdditiveBlending,
+
+        depthWrite: false
+
+    });
+
+const heart =
+    new THREE.Points(
+        heartGeometry,
+        heartMaterial
+    );
+
+universe.add(heart);
+
+
+// =====================================================
+// GLOW
+// =====================================================
+
+const glowCanvas =
+    document.createElement("canvas");
+
+glowCanvas.width = 256;
+glowCanvas.height = 256;
+
+const glowCtx =
+    glowCanvas.getContext("2d");
+
+const gradient =
+    glowCtx.createRadialGradient(
+        128,
+        128,
+        0,
+        128,
+        128,
+        128
+    );
+
+gradient.addColorStop(
+    0,
+    "rgba(255,80,170,0.55)"
+);
+
+gradient.addColorStop(
+    0.35,
+    "rgba(255,40,140,0.25)"
+);
+
+gradient.addColorStop(
+    1,
+    "rgba(255,0,100,0)"
+);
+
+glowCtx.fillStyle =
+    gradient;
+
+glowCtx.fillRect(
+    0,
+    0,
+    256,
+    256
+);
+
+const glowTexture =
+    new THREE.CanvasTexture(
+        glowCanvas
+    );
+
+const glowMaterial =
+    new THREE.SpriteMaterial({
+
+        map: glowTexture,
+
+        transparent: true,
+
+        blending:
+            THREE.AdditiveBlending,
+
+        depthWrite: false
+
+    });
+
+const glow =
+    new THREE.Sprite(
+        glowMaterial
+    );
+
+glow.scale.set(
+    13,
+    13,
+    1
+);
+
+glow.position.set(
+    0,
+    0,
+    -2
+);
+
+universe.add(glow);
+
+
+// =====================================================
+// ÓRBITA DE FOTOS
+// =====================================================
+
+const orbitSystem =
+    new THREE.Group();
+
+orbitSystem.position.y = -13;
+
+universe.add(
+    orbitSystem
+);
+
+const orbitGroup =
+    new THREE.Group();
+
+orbitSystem.add(
+    orbitGroup
+);
+
+const ORBIT_X = 22;
+const ORBIT_Z = 15;
+
+
+// =====================================================
+// LÍNEA DE ÓRBITA
+// =====================================================
+
+const orbitPoints = [];
+
+for (let i = 0; i <= 160; i++) {
+
+    const a =
+        (i / 160) *
+        Math.PI * 2;
+
+    orbitPoints.push(
+        new THREE.Vector3(
+            Math.cos(a) * ORBIT_X,
+            0,
+            Math.sin(a) * ORBIT_Z
+        )
+    );
+}
+
+const orbitGeometry =
+    new THREE.BufferGeometry()
+    .setFromPoints(
+        orbitPoints
+    );
+
+const orbitMaterial =
+    new THREE.LineBasicMaterial({
+
+        color: 0xff5ca8,
+
+        transparent: true,
+
+        opacity: 0.16
+
+    });
+
+const orbitLine =
+    new THREE.Line(
+        orbitGeometry,
+        orbitMaterial
+    );
+
+orbitGroup.add(
+    orbitLine
+);
+
+
+
+ // =====================================================
+ // FOTOS
+ // =====================================================
+
+const imageUrls = [
+    "mimi1.png",
+    "mimi2.png",
+    "mimi3.png",
+    "mimi4.png",
+    "mimi5.png",
+    "mimi6.png"
+];
+
+const imageAngles = [
+    0.32,
+    1.18,
+    2.05,
+    2.92,
+    3.78
+];
+
+const loader = new THREE.TextureLoader();
+loader.setCrossOrigin("anonymous");
+loader.setCrossOrigin("anonymous");
+
+loader.load(
+    imageUrls[0],
+    texture => {
+        console.log("IMAGEN CARGADA", texture);
+    },
+    undefined,
+    error => {
+        console.error("ERROR AL CARGAR IMAGEN", error);
+    }
+);
+loader.setCrossOrigin("anonymous");
+
+imageUrls.forEach((url, i) => {
+
+    loader.load(
+        url,
+        texture => {
+
+            const material = new THREE.SpriteMaterial({
+                map: texture,
+                transparent: true
+            });
+
+            const sprite = new THREE.Sprite(material);
+
+            sprite.scale.set(4.2, 4.2, 1);
+
+            const a = imageAngles[i];
+
+            sprite.position.set(
+                Math.cos(a) * ORBIT_X,
+                0,
+                Math.sin(a) * ORBIT_Z
+            );
+
+            sprite.userData.imageIndex = i;
+
+            orbitGroup.add(sprite);
+
+        },
+        undefined,
+        error => {
+            console.error("No se pudo cargar la imagen:", url, error);
+        }
+    );
+
+});
+
+
+
+// =====================================================
+// FRASES
+// =====================================================
+
+const phrases = [
+
+    "Gracias por llegar a mi vida.",
+
+    "Qué bonito encontrarte.",
+  
+    "mi amor",
+
+  "mi vida",
+
+  "afortunada de tenerte en mi vida",
+
+    "Me encanta coincidir con vos.",
+
+    "Me hacés feliz sin darte cuenta.",
+
+    "Me gusta tenerte en mi vida.",
+
+    "Sos mi casualidad favorita.",
+
+    "Te elegiría cada día.",
+
+  
+
+    "Me encanta esto que somos.",
+
+    "Me gusta compartir mi mundo con vos.",
+
+    "Qué suerte haberte encontrado.",
+
+    "Me hacés sentir en casa.",
+
+    "Quiero seguir construyendo lo nuestro.",
+
+    "Te pienso más de lo que admito.",
+
+    "Vos hacés todo más bonito.",
+
+    "Quiero vivir muchos recuerdos con vos.",
+
+    "Quiero conocer todas tus versiones.",
+
+    "Me gusta cómo se siente quererte.",
+
+    "Espero que esto sea apenas el comienzo.",
+
+    "Aunque haya distancia, te siento cerca.",
+
+
+    "Qué lindo que seas vos.",
+
+    "Encontrarte fue una hermosa casualidad.",
+
+    "Gracias por hacerme un lugar en tu vida.",
+  "Qué bonito es compartir mis días con vos.",
+
+"Me gusta la forma en que llegaste a mi vida.",
+
+"Me gusta aprender cosas nuevas sobre vos.",
+
+"Quiero que tengamos mil historias que contar.",
+
+"Hay algo especial en poder llamarte mi novia.",
+
+"Me gusta saber que existís.",
+
+"Quiero conocer cada pequeño detalle de vos.",
+
+"Quiero que te sientas querida conmigo.",
+
+"Me gusta imaginar todo lo que nos queda por vivir.",
+
+"Me encantas.",
+
+"Espero hacerte tan feliz como vos me hacés a mí.",
+
+"Quiero ser alguien con quien puedas contar.",
+
+"Me gustan hasta esas pequeñas cosas que te hacen ser vos.",
+
+"Entre tantas personas, qué bonito que seas vos.",
+
+"me importás mucho.",
+
+"Me haces feliz.",
+
+"Quiero aprender a quererte de la manera que merecés.",
+
+"Qué suerte la mía de poder conocerte así.",
+
+"Me encanta tener una razón para escribirte cosas bonitas.",
+
+"Quiero que te sientas libre de ser vos misma.",
+
+"Espero que algún día la distancia sea solo un recuerdo.",
+
+"Me gusta quererte sin tener que fingir ser alguien más.",
+
+"Me alegra que seas mi novia."
+
+];
+
+
+// =====================================================
+// CREAR FRASES
+// =====================================================
+
+function createTextSprite(text) {
+
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
+
+    canvas.width = 1024;
+    canvas.height = 180;
+
+    const ctx =
+        canvas.getContext("2d");
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    ctx.font =
+        "bold 72px Arial";
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.shadowColor =
+        "rgba(255,70,160,0.9)";
+
+    ctx.shadowBlur = 18;
+
+    ctx.fillStyle =
+        "#ffd2e8";
+
+    let fontSize = 48;
+
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
+
+while (
+    ctx.measureText(text).width > 960 &&
+    fontSize > 20
+) {
+    fontSize -= 2;
+    ctx.font = "bold " + fontSize + "px Arial";
+}
+
+ctx.fillText(
+    text,
+    canvas.width / 2,
+    canvas.height / 2
+);
+
+    const texture =
+        new THREE.CanvasTexture(
+            canvas
+        );
+
+    texture.needsUpdate = true;
+
+    const material =
+        new THREE.SpriteMaterial({
+
+            map: texture,
+
+            transparent: true,
+
+            depthWrite: false
+
+        });
+
+    const sprite =
+        new THREE.Sprite(
+            material
+        );
+
+    return sprite;
+}
+
+
+// =====================================================
+// FRASES ALREDEDOR DEL CORAZÓN
+// =====================================================
+
+const phraseOrbit =
+    new THREE.Group();
+
+universe.add(
+    phraseOrbit
+);
+
+
+// =====================================================
+// DISTRIBUCIÓN AUTOMÁTICA
+// =====================================================
+
+for (
+    let i = 0;
+    i < phrases.length;
+    i++
+) {
+
+    const sprite =
+        createTextSprite(
+            phrases[i]
+        );
+
+
+    const angle =
+        (i / phrases.length) *
+        Math.PI *
+        2;
+
+
+    const ring =
+        i % 2;
+
+
+    const radiusX =
+        ring === 0
+            ? 20
+            : 27;
+
+
+    const radiusZ =
+        ring === 0
+            ? 13
+            : 19;
+
+
+    const x =
+        Math.cos(angle) *
+        radiusX;
+
+
+    const y =
+        Math.sin(
+            i * 2.4
+        ) * 7;
+
+
+    const z =
+        Math.sin(angle) *
+        radiusZ;
+
+
+    sprite.position.set(
+        x,
+        y,
+        z
+    );
+
+
+    sprite.rotation.set(
+        0,
+        0,
+        0
+    );
+
+
+    sprite.scale.set(
+        7.5,
+        1.35,
+        1
+    );
+
+
+    phraseOrbit.add(
+        sprite
+    );
+}
+
+
+// =====================================================
+// PARTÍCULAS ROSADAS
+// =====================================================
+
+const particleCount = 450;
+
+const particlePositions =
+    new Float32Array(
+        particleCount * 3
+    );
+
+const particleData = [];
+
+for (
+    let i = 0;
+    i < particleCount;
+    i++
+) {
+
+    const angle =
+        Math.random() *
+        Math.PI * 2;
+
+    const radius =
+        0.55 +
+        Math.random() * 0.45;
+
+    const startX =
+        Math.cos(angle) *
+        ORBIT_X *
+        radius;
+
+    const startZ =
+        Math.sin(angle) *
+        ORBIT_Z *
+        radius;
+
+    const startY =
+        -1 +
+        Math.random() * 1.5;
+
+    particlePositions[i * 3] =
+        startX;
+
+    particlePositions[i * 3 + 1] =
+        startY;
+
+    particlePositions[i * 3 + 2] =
+        startZ;
+
+    particleData.push({
+
+        startX,
+
+        startY,
+
+        startZ,
+
+        progress:
+            Math.random(),
+
+        speed:
+            0.0015 +
+            Math.random() * 0.0025,
+
+        side:
+            (Math.random() - 0.5) * 8
+
+    });
+
+}
+
+const particleGeometry =
+    new THREE.BufferGeometry();
+
+particleGeometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(
+        particlePositions,
+        3
+    )
+);
+
+const particleMaterial =
+    new THREE.PointsMaterial({
+
+        color: 0xff62ae,
+
+        size: 0.18,
+
+        transparent: true,
+
+        opacity: 0.85,
+
+        blending:
+            THREE.AdditiveBlending,
+
+        depthTest: false,
+
+        depthWrite: false
+
+    });
+
+const risingParticles =
+    new THREE.Points(
+        particleGeometry,
+        particleMaterial
+    );
+
+orbitGroup.add(
+    risingParticles
+);
+
+
+ // =====================================================
+ // DESTELLOS SUAVES
+ // =====================================================
+
+const sparkleGeometry = new THREE.BufferGeometry();
+
+const sparklePositions = [];
+
+for (let i = 0; i < 45; i++) {
+    sparklePositions.push(
+        (Math.random() - 0.5) * 35,
+        (Math.random() - 0.5) * 25,
+        (Math.random() - 0.5) * 15
+    );
+}
+
+sparkleGeometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(
+        sparklePositions,
+        3
+    )
+);
+
+const sparkleMaterial = new THREE.PointsMaterial({
+    color: 0xffc5e5,
+    size: 0.16,
+    transparent: true,
+    opacity: 0.8,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+});
+
+const sparkles = new THREE.Points(
+    sparkleGeometry,
+    sparkleMaterial
+);
+
+universe.add(sparkles);
+
+  
+// =====================================================
+// ESTRELLAS
+// =====================================================
+
+const starCount = 700;
+
+const starPositions =
+    new Float32Array(
+        starCount * 3
+    );
+
+for (
+    let i = 0;
+    i < starCount;
+    i++
+) {
+
+    starPositions[i * 3] =
+        (Math.random() - 0.5) * 140;
+
+    starPositions[i * 3 + 1] =
+        (Math.random() - 0.5) * 100;
+
+    starPositions[i * 3 + 2] =
+        (Math.random() - 0.5) * 100;
+
+}
+
+const starGeometry =
+    new THREE.BufferGeometry();
+
+starGeometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(
+        starPositions,
+        3
+    )
+);
+
+const starMaterial =
+    new THREE.PointsMaterial({
+
+        color: 0xffffff,
+
+        size: 0.12,
+
+        transparent: true,
+
+        opacity: 0.55
+
+    });
+
+const stars =
+    new THREE.Points(
+        starGeometry,
+        starMaterial
+    );
+
+scene.add(
+    stars
+);
+
+
+// =====================================================
+// INTERACCIÓN
+// =====================================================
+
+let dragging = false;
+
+let lastX = 0;
+let lastY = 0;
+
+let velocityX = 0;
+let velocityY = 0;
+
+
+renderer.domElement.addEventListener(
+    "pointerdown",
+    event => {
+
+        dragging = true;
+
+        lastX =
+            event.clientX;
+
+        lastY =
+            event.clientY;
+
+        velocityX = 0;
+        velocityY = 0;
+
+        renderer.domElement.setPointerCapture(
+            event.pointerId
+        );
+
+    }
+);
+
+
+renderer.domElement.addEventListener(
+    "pointermove",
+    event => {
+
+        if (!dragging) return;
+
+        const dx =
+            event.clientX -
+            lastX;
+
+        const dy =
+            event.clientY -
+            lastY;
+
+        lastX =
+            event.clientX;
+
+        lastY =
+            event.clientY;
+
+        velocityX =
+            dx * 0.003;
+
+        velocityY =
+            dy * 0.002;
+
+
+        orbitGroup.rotation.y +=
+            velocityX;
+
+        orbitGroup.rotation.x +=
+            velocityY * 0.35;
+
+
+        phraseOrbit.rotation.y +=
+            velocityX * 0.75;
+
+        phraseOrbit.rotation.x +=
+            velocityY * 0.25;
+
+    }
+);
+
+
+renderer.domElement.addEventListener(
+    "pointerup",
+    event => {
+
+        dragging = false;
+
+        renderer.domElement.releasePointerCapture(
+            event.pointerId
+        );
+
+    }
+);
+
+
+renderer.domElement.addEventListener(
+    "pointercancel",
+    () => {
+
+        dragging = false;
+
+    }
+);
+
+
+// =====================================================
+// VISOR
+// =====================================================
+
+const viewer =
+    document.createElement(
+        "div"
+    );
+
+viewer.style.position =
+    "fixed";
+
+viewer.style.left = "0";
+viewer.style.top = "0";
+
+viewer.style.width =
+    "100%";
+
+viewer.style.height =
+    "100%";
+
+viewer.style.background =
+    "rgba(0,0,0,0.94)";
+
+viewer.style.display =
+    "none";
+
+viewer.style.alignItems =
+    "center";
+
+viewer.style.justifyContent =
+    "center";
+
+viewer.style.zIndex =
+    "9999";
+
+
+const viewerImage =
+    document.createElement(
+        "img"
+    );
+
+viewerImage.style.maxWidth =
+    "90%";
+
+viewerImage.style.maxHeight =
+    "90%";
+
+viewerImage.style.objectFit =
+    "contain";
+
+viewerImage.style.borderRadius =
+    "14px";
+
+
+viewer.appendChild(
+    viewerImage
+);
+
+document.body.appendChild(
+    viewer
+);
+
+
+// =====================================================
+// CLICK EN FOTOS
+// =====================================================
+
+renderer.domElement.addEventListener(
+    "click",
+    event => {
+
+        const mouse =
+            new THREE.Vector2();
+
+        mouse.x =
+            (event.clientX /
+                window.innerWidth) *
+            2 - 1;
+
+        mouse.y =
+            -(event.clientY /
+                window.innerHeight) *
+            2 + 1;
+
+
+        const raycaster =
+            new THREE.Raycaster();
+
+        raycaster.setFromCamera(
+            mouse,
+            camera
+        );
+
+
+        const objects =
+            raycaster.intersectObjects(
+                orbitGroup.children,
+                true
+            );
+
+
+        for (
+            const hit of objects
+        ) {
+
+            if (
+                hit.object.userData &&
+                hit.object.userData.imageIndex !==
+                undefined
+            ) {
+
+                const index =
+                    hit.object.userData.imageIndex;
+
+                viewerImage.src =
+                    imageUrls[index];
+
+                viewer.style.display =
+                    "flex";
+
+                break;
+
+            }
+
+        }
+
+    }
+);
+
+
+// =====================================================
+// CERRAR VISOR
+// =====================================================
+
+viewer.addEventListener(
+    "click",
+    () => {
+
+        viewer.style.display =
+            "none";
+
+    }
+);
+
+
+// =====================================================
+// ANIMACIÓN
+// =====================================================
+
+const clock =
+    new THREE.Clock();
+
+
+function animate() {
+
+    requestAnimationFrame(
+        animate
+    );
+
+
+    const time =
+        clock.getElapsedTime();
+  
+sparkles.material.opacity =
+    0.35 + (Math.sin(time * 2) + 1) * 0.3;
+
+
+
+    // CORAZÓN
+
+    heart.rotation.y =
+        Math.sin(
+            time * 0.35
+        ) * 0.025;
+
+    heart.rotation.x =
+        Math.sin(
+            time * 0.25
+        ) * 0.015;
+
+
+    // ÓRBITA DE FOTOS
+
+    if (!dragging) {
+
+        orbitGroup.rotation.y +=
+            0.0007 +
+            velocityX * 0.35;
+
+        orbitGroup.rotation.x *=
+            0.995;
+
+        velocityX *= 0.96;
+        velocityY *= 0.96;
+
+    }
+
+
+    // FRASES
+
+    if (!dragging) {
+
+        phraseOrbit.rotation.y +=
+            0.0009;
+
+        phraseOrbit.rotation.x *=
+            0.995;
+
+    }
+
+
+    // PARTÍCULAS
+
+    const positions =
+        particleGeometry
+        .attributes
+        .position
+        .array;
+
+
+    for (
+        let i = 0;
+        i < particleCount;
+        i++
+    ) {
+
+        const p =
+            particleData[i];
+
+        p.progress +=
+            p.speed;
+
+
+        if (p.progress > 1) {
+
+            p.progress = 0;
+
+
+            const angle =
+                Math.random() *
+                Math.PI * 2;
+
+
+            const radius =
+                0.55 +
+                Math.random() *
+                0.45;
+
+
+            p.startX =
+                Math.cos(angle) *
+                ORBIT_X *
+                radius;
+
+
+            p.startZ =
+                Math.sin(angle) *
+                ORBIT_Z *
+                radius;
+
+
+            p.startY =
+                -1 +
+                Math.random() * 1.5;
+
+
+            p.side =
+                (Math.random() - 0.5) *
+                8;
+
+        }
+
+
+        const ease =
+            p.progress *
+            p.progress;
+
+
+        const side =
+            p.side *
+            Math.sin(
+                p.progress *
+                Math.PI
+            );
+
+
+        positions[i * 3] =
+            p.startX *
+            (1 - ease) +
+            side;
+
+
+        positions[i * 3 + 1] =
+            p.startY +
+            ease * 18;
+
+
+        positions[i * 3 + 2] =
+            p.startZ *
+            (1 - ease);
+
+    }
+
+
+    particleGeometry
+        .attributes
+        .position
+        .needsUpdate = true;
+
+
+    // ESTRELLAS
+
+    stars.rotation.y =
+        time * 0.002;
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+animate();
+
+
+// =====================================================
+// RESIZE
+// =====================================================
+
+window.addEventListener("resize", function() {
+
+    camera.aspect =
+        window.innerWidth /
+        window.innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio,
+            2
+        )
+    );
+
+});
+
+  </script>
+
+</body>
+</html>
+</html>
